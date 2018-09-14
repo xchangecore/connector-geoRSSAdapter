@@ -1084,6 +1084,19 @@ public class GeoRSSReader extends Thread implements FetcherListener, ConstantDat
                     feedFetcher.retrieveFeed(new URL(configuration.getUrl()));
                     //	feedFetcher2.retrieveFeed(new URL("http://www.inciweb.org/feeds/rss/incidents")); 
 
+                } catch (SocketTimeoutException ste) {
+                    Thread.currentThread().sleep(5000);
+                    logger.error("Read Timeout accessing the feed: " +
+                            configuration.getUrl() +
+                            ": " +
+                            ste.getMessage());
+                    //try to re run the thread.
+                    if (rerunCount < threadReTryCount) {
+                        rerunCount++;
+                        System.out.println("thread got SocketTimeout Exceptopn, re-try it.");
+
+                        continue runAgain;
+                    }
                 } catch (ConnectException e) {
                     logger.error("Cannot access the feed: " +
                                  configuration.getUrl() +
